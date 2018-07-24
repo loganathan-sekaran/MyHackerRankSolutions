@@ -52,6 +52,7 @@ public class SolutionClimbLeaderBoard {
 			final int prime = 31;
 			int result = 1;
 			result = prime * result + ((name == null) ? 0 : name.hashCode());
+			result = prime * result + score;
 			return result;
 		}
 
@@ -69,47 +70,67 @@ public class SolutionClimbLeaderBoard {
 					return false;
 			} else if (!name.equals(other.name))
 				return false;
+			if (score != other.score)
+				return false;
 			return true;
 		}
 
 		@Override
 		public int compareTo(Player o) {
-			return o.score - this.score;
+			int res = o.score - this.score;
+			
+			if(res == 0) {
+				res =  o.getName().compareToIgnoreCase(this.getName());
+			}
+			
+			return res;
 		}
+
+		@Override
+		public String toString() {
+			return "Player [name=" + name + ", score=" + score + ", rank=" + rank + "]";
+		}
+		
+		
 
 	}
 
 	// Complete the climbingLeaderboard function below.
 	static int[] climbingLeaderboard(int[] scores, int[] alice) {
-		List<Player> scoreBoard = new ArrayList<>(
-				IntStream.of(scores).boxed().map(score -> new Player("Unknown", score)).collect(Collectors.toList()));
-		final Player aliceDummy = new Player("Alice", -1);
+		SortedSet<Player> scoreBoard = new TreeSet<Player>() {
+			@Override
+			public boolean add(Player e) {
+				boolean res = super.add(e);
+				Player last = this.lower(e);
+				if (last != null) {
+					if (e.getScore() == last.getScore()) {
+						e.setRank(last.getRank());
+					} else {
+						e.setRank(last.getRank() + 1);
+					}
+				} else {
+					e.setRank(1);
+				}
+				return res;
+			}
+		};
+		
+
+		IntStream.of(scores).boxed().map(score -> new Player("Unknown", score)).forEach(scoreBoard::add);
+		
+		Player lastAliceObj = null;
 		List<Integer> aliceRanks = new ArrayList<>(alice.length);
-		for (int score : alice) {
-			if (scoreBoard.contains(aliceDummy)) {
-				scoreBoard.remove(aliceDummy);
+
+		for (int j = 0; j < alice.length; j++) {
+			int score = alice[j];
+			if(j > 0 && score != lastAliceObj.getScore()) {
+				scoreBoard.remove(lastAliceObj);
 			}
 			Player aliceNew = new Player("Alice", score);
 			scoreBoard.add(aliceNew);
-
-			Collections.sort(scoreBoard);
-
-			int lastScore = -1;
-			int lastRank = 0;
-			for (int i = 0; i < scoreBoard.size(); i++) {
-				Player p = scoreBoard.get(i);
-				if (lastScore != p.getScore()) {
-					lastScore = p.getScore();
-					lastRank++;
-				}
-				p.setRank(lastRank);
-				if(p.equals(aliceNew)) {
-					break;
-				}
-			}
+			lastAliceObj = aliceNew;
 
 			aliceRanks.add(aliceNew.getRank());
-
 		}
 
 		return aliceRanks.stream().mapToInt(e -> e).toArray();
