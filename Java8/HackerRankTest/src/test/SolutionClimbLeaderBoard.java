@@ -123,14 +123,19 @@ public class SolutionClimbLeaderBoard {
 
 		for (int j = 0; j < alice.length; j++) {
 			int score = alice[j];
-			if(j > 0 && score != lastAliceObj.getScore()) {
-				scoreBoard.remove(lastAliceObj);
+			if(j == 0 ) {
+				lastAliceObj = new Player("Alice", score);
+			} else {
+				if(lastAliceObj != null && lastAliceObj.getScore() != score) {
+					scoreBoard.remove(lastAliceObj);
+					lastAliceObj.setScore(score);
+				}
 			}
-			Player aliceNew = new Player("Alice", score);
-			scoreBoard.add(aliceNew);
-			lastAliceObj = aliceNew;
+			
+			scoreBoard.add(lastAliceObj);
 
-			aliceRanks.add(aliceNew.getRank());
+
+			aliceRanks.add(lastAliceObj.getRank());
 		}
 
 		return aliceRanks.stream().mapToInt(e -> e).toArray();
