@@ -15,15 +15,17 @@ public class SolutionBiggerIsGreater {
     static String biggerIsGreater(String w) {
         char[] chars = w.toCharArray();
         boolean changed = false;
+        int lastChangedJ = -1;
         outer:
         for (int i = chars.length - 1; i >= 0; i--) {
 			char c = chars[i];
 			inner:
-			for (int j = i - 1; j >= 0; j--) {
-				if(c > chars[j]) {
+			for (int j = i - 1; j >= (lastChangedJ == -1 ? 0 : lastChangedJ + 1); j--) {
+				if(!changed ? c > chars[j] : c < chars[j]) {
 					chars[i] = chars[j];
 					chars[j] = c;
-					
+					lastChangedJ = j;
+					i = chars.length;
 					List<Character> restChars = new ArrayList<>();
 					for (int k = j+ 1; k < chars.length; k++) {
 						restChars.add(chars[k]);
@@ -36,7 +38,7 @@ public class SolutionBiggerIsGreater {
 					}
 					
 					changed = true;
-					break outer;
+					break;
 				}
 			}
 		}
