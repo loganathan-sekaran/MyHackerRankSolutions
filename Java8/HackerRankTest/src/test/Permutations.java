@@ -7,16 +7,19 @@ import java.util.function.Consumer;
 public class Permutations {
 	
 	public static String[] findPermutations(String w) {
+		ArrayList<String> permutations = new ArrayList<>();
+		findPermutations(w, chars1 -> permutations.add(String.valueOf(chars1)));
+		return permutations.toArray(new String[permutations.size()]);
+	}
+	
+	public static void findPermutations(String w, Consumer<char[]> charsConsumer) {
 		char[] chars = w.toCharArray();
 		if(chars.length <= 1) {
-			return new String[] {w};
+			charsConsumer.accept(chars);
+			return;
 		}
 		
-		ArrayList<String> permutations = new ArrayList<>();
-		
-		findPermutations(chars, new char[0], chars, chars1 -> permutations.add(String.valueOf(chars1)));
-		
-		return permutations.toArray(new String[permutations.size()]);
+		findPermutations(chars, new char[0], chars, charsConsumer);
 	}
 
 	private static void findPermutations(char[] allChars, char[] refChars, char[] restChars, Consumer<char[]> charsConsumer) {

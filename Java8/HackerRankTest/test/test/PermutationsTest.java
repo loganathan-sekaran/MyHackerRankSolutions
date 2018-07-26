@@ -54,6 +54,8 @@ public class PermutationsTest {
 		System.out.println(result);
 		Stream.of(expected).forEach(s -> assertTrue(result.contains(s)));
 		
+		assertEquals(result.stream().distinct().count(), 6);
+		
 	}
 	
 	@Test
@@ -64,7 +66,23 @@ public class PermutationsTest {
 		// default test
 		result = Arrays.asList(Permutations.findPermutations(w));
 		
-		result.stream().distinct().forEach(System.out::println);
+		//result.stream().distinct().forEach(System.out::println);
+		
+		assertEquals(result.stream().distinct().count(), 24);
+		
+	}
+	
+	@Test
+	public void testFindPermutations5() throws Exception {
+		String w = "abcde";
+		List<String> result;
+
+		// default test
+		result = Arrays.asList(Permutations.findPermutations(w));
+		
+		//result.stream().distinct().forEach(System.out::println);
+		
+		assertEquals(result.stream().distinct().count(), 120);
 		
 	}
 }
