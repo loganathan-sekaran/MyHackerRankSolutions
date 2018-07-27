@@ -8,11 +8,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
-public class SolutionQueensAttack {
+public class SolutionQueensAttack0 {
 	
 	static class Table {
 		private int size;
@@ -23,45 +22,44 @@ public class SolutionQueensAttack {
 			this.size = size;
 		}
 
-		public Optional<Position> getNextWest(int row, int column) {
-			return Optional.ofNullable(getOrCreatePosition(row ,  (column - 1)));
+		public Optional<Position> getNextWest(Position position) {
+			return Optional.ofNullable(positions.get(position.getRow() + ":" +  (position.getColumn() - 1)));
 		}
 		
-		public Optional<Position> getNextEast(int row, int column) {
-			return Optional.ofNullable(getOrCreatePosition(row ,  (column + 1)));
+		public Optional<Position> getNextEast(Position position) {
+			return Optional.ofNullable(positions.get(position.getRow() + ":" +  (position.getColumn() + 1)));
 		}
 		
-		public Optional<Position> getNextNorth(int row, int column) {
-			return Optional.ofNullable(getOrCreatePosition((row + 1) ,  (column)));
+		public Optional<Position> getNextNorth(Position position) {
+			return Optional.ofNullable(positions.get((position.getRow() + 1) + ":" +  (position.getColumn())));
 		}
 		
-		public Optional<Position> getNextSouth(int row, int column) {
-			return Optional.ofNullable(getOrCreatePosition((row - 1) ,  (column)));
+		public Optional<Position> getNextSouth(Position position) {
+			return Optional.ofNullable(positions.get((position.getRow() - 1) + ":" +  (position.getColumn())));
 		}
 		
 		
-		public Optional<Position> getNextNorthEast(int row, int column) {
-			return Optional.ofNullable(getOrCreatePosition((row + 1) ,  (column + 1)));
+		public Optional<Position> getNextNorthEast(Position position) {
+			return Optional.ofNullable(positions.get((position.getRow() + 1) + ":" +  (position.getColumn() + 1)));
 		}
 		
-		public Optional<Position> getNextNorthWest(int row, int column) {
-			return Optional.ofNullable(getOrCreatePosition((row + 1) ,  (column - 1)));
+		public Optional<Position> getNextNorthWest(Position position) {
+			return Optional.ofNullable(positions.get((position.getRow() + 1) + ":" +  (position.getColumn() - 1)));
 		}
 		
-		public Optional<Position> getNextSouthEast(int row, int column) {
-			return Optional.ofNullable(getOrCreatePosition((row - 1) ,  (column + 1)));
+		public Optional<Position> getNextSouthEast(Position position) {
+			return Optional.ofNullable(positions.get((position.getRow() - 1) + ":" +  (position.getColumn() + 1)));
 		}
 		
-		public Optional<Position> getNextSouthWest(int row, int column) {
-			return Optional.ofNullable(getOrCreatePosition((row - 1) ,  (column - 1)));
+		public Optional<Position> getNextSouthWest(Position position) {
+			return Optional.ofNullable(positions.get((position.getRow() - 1) + ":" +  (position.getColumn() - 1)));
 		}
 		
-		public int getNextPossibleMovementsCount(Position position, BiFunction<Integer, Integer, Optional<Position>> direction) {
+		public int getNextPossibleMovementsCount(Position position, Function<Position, Optional<Position>> direction) {
 			int count = 0;
 			Optional<Position> nextPosition = Optional.of(position);
 			while(nextPosition.isPresent()) {
-				Position pos = nextPosition.get();
-				nextPosition = direction.apply(pos.getRow(), nextPosition.get().getColumn());
+				nextPosition = direction.apply(nextPosition.get());
 				if(nextPosition.isPresent() && !nextPosition.get().isOccupied()) {
 					count++;
 				} else {
@@ -73,22 +71,16 @@ public class SolutionQueensAttack {
 		
 		
 		public Position getPosition(int row, int column) {
-			if(row >= 1 && row <= size && column >= 1 && column <= size) {
-				return positions.get(row + ":" +  column);
-			}
-			return null;
+			return positions.get(row + ":" +  column);
 		}
 		
 		public Position getOrCreatePosition(int row, int column) {
-			if(row >= 1 && row <= size && column >= 1 && column <= size) {
-				Position position = getPosition(row, column);
-				if( position == null ) {
-					position = new Position(row, column);
-					positions.put(row + ":" + column, position);
-				}
-				return position;
+			Position position = getPosition(row, column);
+			if( position == null ) {
+				position = new Position(row, column);
+				positions.put((row + 1) + ":" + (column + 1), position);
 			}
-			return null;
+			return position;
 			
 			
 		}
@@ -142,12 +134,12 @@ public class SolutionQueensAttack {
     // Complete the queensAttack function below.
     static int queensAttack(int n, int k, int r_q, int c_q, int[][] obstacles) {
     	Table table = new Table(n);
-    	Position queenPosition = table.getOrCreatePosition(r_q, c_q);
+    	Position queenPosition = table.getPosition(r_q, c_q);
     	queenPosition.setCoin("Queen");
     	
     	for(int i = 0; i < obstacles.length; i++) {
     		int[] row = obstacles[i];
-    		Position obsPosition = table.getOrCreatePosition(row[0], row[1]);
+    		Position obsPosition = table.getPosition(row[0], row[1]);
     		obsPosition.setCoin("Obstacle" + (i + 1));
     	}
     	
